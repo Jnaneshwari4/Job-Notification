@@ -13,96 +13,39 @@
 <body>
     <div class="app-container">
         
-        <!-- TOP BAR -->
-        <header class="top-bar">
-            <div class="top-bar-left">
-                Job Notification App
+        <!-- TOP BAR & NAVIGATION -->
+        <header class="header-container">
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    Job Notification App
+                </div>
+                <div class="top-bar-center hide-mobile">
+                    Step 2 / 5
+                </div>
+                <div class="top-bar-right">
+                    <span class="badge status-shipped hide-mobile">In Progress</span>
+                    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div class="top-bar-center">
-                Step 2 / 5
-            </div>
-            <div class="top-bar-right">
-                <span class="badge status-shipped">In Progress</span>
-            </div>
+
+            <nav class="nav-bar" id="navBar">
+                <a href="/dashboard" class="nav-link" data-route>Dashboard</a>
+                <a href="/saved" class="nav-link" data-route>Saved</a>
+                <a href="/digest" class="nav-link" data-route>Digest</a>
+                <a href="/settings" class="nav-link" data-route>Settings</a>
+                <a href="/proof" class="nav-link" data-route>Proof</a>
+            </nav>
         </header>
 
-        <!-- CONTEXT HEADER -->
-        <section class="context-header">
-            <h1>Configure Dispatch Rules</h1>
-            <p class="subtext">Define how and when notifications are sent to your candidate pool. These rules operate globally across all active requisitions.</p>
-        </section>
-
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            
-            <!-- PRIMARY WORKSPACE (70%) -->
-            <div class="primary-workspace">
-                
-                <!-- standard card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Trigger Conditions</h2>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="trigger-name">Rule Name</label>
-                        <input type="text" id="trigger-name" class="form-control" placeholder="e.g. Senior Engineering Roles">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="trigger-frequency">Dispatch Frequency</label>
-                        <select id="trigger-frequency" class="form-control">
-                            <option>Immediate</option>
-                            <option>Daily Digest</option>
-                            <option>Weekly Summary</option>
-                        </select>
-                    </div>
-
-                    <div class="btn-group">
-                        <button class="btn btn-primary">Save Condition</button>
-                        <button class="btn btn-secondary">Cancel</button>
-                    </div>
-                </div>
-
-                <!-- empty state -->
-                <div class="empty-state">
-                    <h3>No filters applied</h3>
-                    <p>Start by adding job criteria to narrow down the audience for this specific notification stream.</p>
-                    <button class="btn btn-secondary">Add Filter Criteria</button>
-                </div>
-
-                <!-- error state -->
-                <div class="alert alert-error">
-                    <div class="alert-title">Delivery Configuration Incomplete</div>
-                    <div class="alert-body">The selected provider requires an active API key. Please update your workspace settings before activating this rule.</div>
-                </div>
-
-            </div>
-
-            <!-- SECONDARY PANEL (30%) -->
-            <aside class="secondary-panel">
-                
-                <div class="card">
-                    <h3>Step Explanation</h3>
-                    <p>Trigger conditions determine the exact moment a candidate receives a notification. A poorly configured trigger may result in message fatigue.</p>
-                    
-                    <div class="prompt-box">
-                        {
-                          "event": "job.published",
-                          "conditions": {
-                            "seniority": ["lead", "senior"]
-                          }
-                        }
-                        <div class="prompt-actions">
-                            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">Copy JSON schema</button>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" style="width: 100%;">View Documentation</button>
-                </div>
-
-            </aside>
-
+        <!-- ROUTE OUTLET -->
+        <main class="main-content" id="route-outlet">
+            <!-- Content will be injected here by the router -->
         </main>
 
         <!-- PROOF FOOTER -->
@@ -116,5 +59,126 @@
         </footer>
 
     </div>
+
+    <!-- TEMPLATES -->
+    <template id="tpl-/">
+        <section class="context-header">
+            <h1>Overview</h1>
+            <p class="subtext">This section will be built in the next step.</p>
+        </section>
+    </template>
+
+    <template id="tpl-/dashboard">
+        <section class="context-header">
+            <h1>Dashboard</h1>
+            <p class="subtext">This section will be built in the next step.</p>
+        </section>
+    </template>
+
+    <template id="tpl-/saved">
+        <section class="context-header">
+            <h1>Saved</h1>
+            <p class="subtext">This section will be built in the next step.</p>
+        </section>
+    </template>
+
+    <template id="tpl-/digest">
+        <section class="context-header">
+            <h1>Digest</h1>
+            <p class="subtext">This section will be built in the next step.</p>
+        </section>
+    </template>
+
+    <template id="tpl-/settings">
+        <section class="context-header">
+            <h1>Settings</h1>
+            <p class="subtext">This section will be built in the next step.</p>
+        </section>
+    </template>
+
+    <template id="tpl-/proof">
+        <section class="context-header">
+            <h1>Proof</h1>
+            <p class="subtext">This section will be built in the next step.</p>
+        </section>
+    </template>
+
+    <template id="tpl-404">
+        <section class="context-header">
+            <h1>Page Not Found</h1>
+            <p class="subtext">The page you are looking for does not exist.</p>
+        </section>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const outlet = document.getElementById('route-outlet');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navBar = document.getElementById('navBar');
+
+            // Routing logic
+            const navigateTo = (path) => {
+                history.pushState(null, '', path);
+                renderRoute(path);
+            };
+
+            const renderRoute = (path) => {
+                // Determine template ID
+                let templateId = `tpl-${path}`;
+                let template = document.getElementById(templateId);
+
+                if (!template) {
+                    template = document.getElementById('tpl-404');
+                }
+
+                // Clear outlet and inject new template content
+                outlet.innerHTML = '';
+                outlet.appendChild(template.content.cloneNode(true));
+
+                // Update active link
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === path) {
+                        link.classList.add('active');
+                    }
+                });
+
+                // Close mobile menu on navigation
+                navBar.classList.remove('open');
+            };
+
+            // Click interceptor for data-route links
+            document.body.addEventListener('click', e => {
+                if (e.target.matches('[data-route]')) {
+                    e.preventDefault();
+                    navigateTo(e.target.getAttribute('href'));
+                }
+            });
+
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', () => {
+                renderRoute(window.location.pathname);
+            });
+
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', () => {
+                navBar.classList.toggle('open');
+            });
+
+            // Handle the initial load (default to index template if route is generic /)
+            const initialPath = window.location.pathname === '/' || window.location.pathname.endsWith('index.html') ? '/' : window.location.pathname;
+            
+            // Note: Since this is a static file server context for the subagent/design system,
+            // we will default to '/' if they loaded the file directly so the UI doesn't look blank.
+            const p = initialPath.includes('.html') ? '/' : initialPath;
+            renderRoute(p);
+            
+            // To provide a smooth visual start if testing as file:///
+            if (window.location.protocol === 'file:') {
+                renderRoute('/dashboard'); // Pre-select a route for file browsing visually.
+            }
+        });
+    </script>
 </body>
 </html>
