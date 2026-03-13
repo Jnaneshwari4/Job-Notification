@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Notification App - Design System</title>
+    <title>Job Notification Tracker - Design System</title>
     <!-- Use Inter and Merriweather from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,13 +17,9 @@
         <header class="header-container">
             <div class="top-bar">
                 <div class="top-bar-left">
-                    Job Notification App
-                </div>
-                <div class="top-bar-center hide-mobile">
-                    Step 2 / 5
+                    Job Notification Tracker
                 </div>
                 <div class="top-bar-right">
-                    <span class="badge status-shipped hide-mobile">In Progress</span>
                     <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -62,44 +58,80 @@
 
     <!-- TEMPLATES -->
     <template id="tpl-/">
-        <section class="context-header">
-            <h1>Overview</h1>
-            <p class="subtext">This section will be built in the next step.</p>
+        <section class="context-header" style="text-align: center; margin: 0 auto 64px auto;">
+            <h1 style="font-size: 56px; margin-bottom: 24px;">Stop Missing The Right Jobs.</h1>
+            <p class="subtext" style="font-size: 20px; margin-bottom: 40px;">Precision-matched job discovery delivered daily at 9AM.</p>
+            <a href="/settings" class="btn btn-primary" data-route style="font-size: 18px; padding: 16px 40px;">Start Tracking</a>
         </section>
     </template>
 
     <template id="tpl-/dashboard">
         <section class="context-header">
             <h1>Dashboard</h1>
-            <p class="subtext">This section will be built in the next step.</p>
         </section>
+        <div class="empty-state">
+            <h3>No jobs yet.</h3>
+            <p>In the next step, you will load a realistic dataset.</p>
+        </div>
     </template>
 
     <template id="tpl-/saved">
         <section class="context-header">
             <h1>Saved</h1>
-            <p class="subtext">This section will be built in the next step.</p>
         </section>
+        <div class="empty-state">
+            <h3>No saved jobs</h3>
+            <p>Saved jobs will appear here later.</p>
+        </div>
     </template>
 
     <template id="tpl-/digest">
         <section class="context-header">
             <h1>Digest</h1>
-            <p class="subtext">This section will be built in the next step.</p>
         </section>
+        <div class="empty-state">
+            <h3>Daily Digest</h3>
+            <p>A daily job digest feature will be added here later.</p>
+        </div>
     </template>
 
     <template id="tpl-/settings">
         <section class="context-header">
             <h1>Settings</h1>
-            <p class="subtext">This section will be built in the next step.</p>
+            <p class="subtext">Configure your matching parameters.</p>
         </section>
+        <div class="card" style="max-width: 720px;">
+            <div class="form-group">
+                <label class="form-label">Role keywords</label>
+                <input type="text" class="form-control" placeholder="e.g. Frontend Engineer, Product Manager">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Preferred locations</label>
+                <input type="text" class="form-control" placeholder="e.g. New York, London, Remote">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mode</label>
+                <select class="form-control">
+                    <option>Remote</option>
+                    <option>Hybrid</option>
+                    <option>Onsite</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Experience level</label>
+                <select class="form-control">
+                    <option>Entry</option>
+                    <option>Mid</option>
+                    <option>Senior</option>
+                </select>
+            </div>
+        </div>
     </template>
 
     <template id="tpl-/proof">
         <section class="context-header">
             <h1>Proof</h1>
-            <p class="subtext">This section will be built in the next step.</p>
+            <p class="subtext">Artifacts and verification will appear here later.</p>
         </section>
     </template>
 
@@ -117,15 +149,18 @@
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const navBar = document.getElementById('navBar');
 
-            // Routing logic
-            const navigateTo = (path) => {
-                history.pushState(null, '', path);
-                renderRoute(path);
-            };
-
             const renderRoute = (path) => {
+                // Clean up path
+                let currentPath = path || '/';
+                if (currentPath.startsWith('#')) {
+                    currentPath = currentPath.substring(1);
+                }
+                if (currentPath === '' || currentPath.endsWith('index.html')) {
+                    currentPath = '/';
+                }
+
                 // Determine template ID
-                let templateId = `tpl-${path}`;
+                let templateId = `tpl-${currentPath}`;
                 let template = document.getElementById(templateId);
 
                 if (!template) {
@@ -139,7 +174,9 @@
                 // Update active link
                 navLinks.forEach(link => {
                     link.classList.remove('active');
-                    if (link.getAttribute('href') === path) {
+                    const linkPath = link.getAttribute('href');
+                    const hashPath = `#${linkPath}`;
+                    if (linkPath === currentPath || linkPath === `/${currentPath}` || currentPath === linkPath.substring(1)) {
                         link.classList.add('active');
                     }
                 });
@@ -148,17 +185,46 @@
                 navBar.classList.remove('open');
             };
 
+            // Routing logic
+            const navigateTo = (path) => {
+                const isLocalFile = window.location.protocol === 'file:';
+                if (isLocalFile) {
+                    // Safe local file routing using hash
+                    window.location.hash = path;
+                } else {
+                    // Standard routing
+                    history.pushState(null, '', path);
+                    renderRoute(path);
+                }
+            };
+
             // Click interceptor for data-route links
             document.body.addEventListener('click', e => {
-                if (e.target.matches('[data-route]')) {
+                const routeEl = e.target.closest('[data-route]');
+                if (routeEl) {
                     e.preventDefault();
-                    navigateTo(e.target.getAttribute('href'));
+                    let path = routeEl.getAttribute('href');
+                    if (!path && routeEl.getAttribute('data-route')) {
+                        path = routeEl.getAttribute('data-route');
+                    }
+                    if (path) navigateTo(path);
                 }
             });
 
             // Handle browser back/forward buttons
             window.addEventListener('popstate', () => {
-                renderRoute(window.location.pathname);
+                if (window.location.protocol !== 'file:') {
+                    let path = window.location.pathname;
+                    if (path.endsWith('index.html')) path = '/';
+                    renderRoute(path);
+                }
+            });
+            
+            // Handle local file back/forward buttons
+            window.addEventListener('hashchange', () => {
+                if (window.location.protocol === 'file:') {
+                    renderRoute(window.location.hash || '/');
+                }
             });
 
             // Mobile menu toggle
@@ -166,18 +232,17 @@
                 navBar.classList.toggle('open');
             });
 
-            // Handle the initial load (default to index template if route is generic /)
-            const initialPath = window.location.pathname === '/' || window.location.pathname.endsWith('index.html') ? '/' : window.location.pathname;
+            // Handle the initial load
+            let initialPath = window.location.pathname;
             
-            // Note: Since this is a static file server context for the subagent/design system,
-            // we will default to '/' if they loaded the file directly so the UI doesn't look blank.
-            const p = initialPath.includes('.html') ? '/' : initialPath;
-            renderRoute(p);
-            
-            // To provide a smooth visual start if testing as file:///
+            // If opened directly as a local file, default to / or hash
             if (window.location.protocol === 'file:') {
-                renderRoute('/dashboard'); // Pre-select a route for file browsing visually.
+                initialPath = window.location.hash || '/';
+            } else if (initialPath === '/' || initialPath.endsWith('index.html')) {
+                initialPath = '/';
             }
+            
+            renderRoute(initialPath);
         });
     </script>
 </body>
