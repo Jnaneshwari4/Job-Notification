@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Notification App - Design System</title>
+    <!-- Use Inter and Merriweather from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- TOP BAR -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                Job Notification App
+            </div>
+            <div class="top-bar-center">
+                Step 2 / 5
+            </div>
+            <div class="top-bar-right">
+                <span class="badge status-shipped">In Progress</span>
+            </div>
+        </header>
+
+        <!-- CONTEXT HEADER -->
+        <section class="context-header">
+            <h1>Configure Dispatch Rules</h1>
+            <p class="subtext">Define how and when notifications are sent to your candidate pool. These rules operate globally across all active requisitions.</p>
+        </section>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- PRIMARY WORKSPACE (70%) -->
+            <div class="primary-workspace">
+                
+                <!-- standard card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Trigger Conditions</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="trigger-name">Rule Name</label>
+                        <input type="text" id="trigger-name" class="form-control" placeholder="e.g. Senior Engineering Roles">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="trigger-frequency">Dispatch Frequency</label>
+                        <select id="trigger-frequency" class="form-control">
+                            <option>Immediate</option>
+                            <option>Daily Digest</option>
+                            <option>Weekly Summary</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary">Save Condition</button>
+                        <button class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- empty state -->
+                <div class="empty-state">
+                    <h3>No filters applied</h3>
+                    <p>Start by adding job criteria to narrow down the audience for this specific notification stream.</p>
+                    <button class="btn btn-secondary">Add Filter Criteria</button>
+                </div>
+
+                <!-- error state -->
+                <div class="alert alert-error">
+                    <div class="alert-title">Delivery Configuration Incomplete</div>
+                    <div class="alert-body">The selected provider requires an active API key. Please update your workspace settings before activating this rule.</div>
+                </div>
+
+            </div>
+
+            <!-- SECONDARY PANEL (30%) -->
+            <aside class="secondary-panel">
+                
+                <div class="card">
+                    <h3>Step Explanation</h3>
+                    <p>Trigger conditions determine the exact moment a candidate receives a notification. A poorly configured trigger may result in message fatigue.</p>
+                    
+                    <div class="prompt-box">
+                        {
+                          "event": "job.published",
+                          "conditions": {
+                            "seniority": ["lead", "senior"]
+                          }
+                        }
+                        <div class="prompt-actions">
+                            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">Copy JSON schema</button>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%;">View Documentation</button>
+                </div>
+
+            </aside>
+
+        </main>
+
+        <!-- PROOF FOOTER -->
+        <footer class="proof-footer">
+            <ul class="checklist">
+                <li class="checked">UI Built</li>
+                <li>Logic Working</li>
+                <li>Test Passed</li>
+                <li>Deployed</li>
+            </ul>
+        </footer>
+
+    </div>
+</body>
+</html>
