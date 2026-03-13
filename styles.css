@@ -449,3 +449,173 @@ a:hover {
   content: "■";
   color: var(--color-success);
 }
+
+/* FILTER BAR */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-16);
+  margin-bottom: var(--space-40);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-24);
+}
+
+.filter-bar .form-group {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 150px;
+}
+
+/* JOB CARDS */
+.jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  margin-bottom: var(--space-64);
+}
+
+.job-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-24);
+  background-color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  transition: border-color var(--transition);
+}
+
+.job-card:hover {
+  border-color: var(--color-border-hover);
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-16);
+}
+
+.job-title {
+  margin-bottom: var(--space-8);
+  font-family: var(--font-serif);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+}
+
+.job-company {
+  color: var(--color-text-muted);
+  font-weight: 500;
+  margin-bottom: var(--space-8);
+}
+
+.job-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-16);
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.job-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.job-meta-item::after {
+  content: "•";
+  margin-left: var(--space-16);
+  color: var(--color-border);
+}
+
+.job-meta-item:last-child::after {
+  display: none;
+}
+
+.job-actions {
+  display: flex;
+  gap: var(--space-16);
+  margin-top: var(--space-8);
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--color-border);
+}
+
+.badge-source {
+  font-size: 12px;
+  padding: 4px 8px;
+  background-color: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+.skill-tag {
+  font-size: 12px;
+  padding: 4px 12px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border-hover);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+}
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(247, 246, 243, 0.9);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-24);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border-hover);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--space-40);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--space-24);
+  right: var(--space-24);
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+
+.modal-close:hover {
+  color: var(--color-text);
+}

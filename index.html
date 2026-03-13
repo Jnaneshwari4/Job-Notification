@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="data.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -69,9 +70,55 @@
         <section class="context-header">
             <h1>Dashboard</h1>
         </section>
-        <div class="empty-state">
-            <h3>No jobs yet.</h3>
-            <p>In the next step, you will load a realistic dataset.</p>
+        
+        <div class="filter-bar">
+            <div class="form-group">
+                <input type="text" id="filter-keyword" class="form-control" placeholder="Search title or company...">
+            </div>
+            <div class="form-group">
+                <select id="filter-location" class="form-control">
+                    <option value="">All Locations</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="filter-mode" class="form-control">
+                    <option value="">All Modes</option>
+                    <option value="Remote">Remote</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="Onsite">Onsite</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="filter-experience" class="form-control">
+                    <option value="">All Experience</option>
+                    <option value="Fresher">Fresher</option>
+                    <option value="0-1">0-1 Years</option>
+                    <option value="1-3">1-3 Years</option>
+                    <option value="3-5">3-5 Years</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="filter-source" class="form-control">
+                    <option value="">All Sources</option>
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="Naukri">Naukri</option>
+                    <option value="Indeed">Indeed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="filter-sort" class="form-control">
+                    <option value="latest">Sort: Latest</option>
+                    <option value="oldest">Sort: Oldest</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="dashboard-jobs-container" class="jobs-list">
+            <!-- Jobs rendered via JS -->
+        </div>
+        <div id="dashboard-empty-state" class="empty-state" style="display: none;">
+            <h3>No jobs match your search.</h3>
+            <p>Try adjusting your filter criteria to see more results.</p>
         </div>
     </template>
 
@@ -79,7 +126,11 @@
         <section class="context-header">
             <h1>Saved</h1>
         </section>
-        <div class="empty-state">
+
+        <div id="saved-jobs-container" class="jobs-list">
+            <!-- Jobs rendered via JS -->
+        </div>
+        <div id="saved-empty-state" class="empty-state">
             <h3>No saved jobs</h3>
             <p>Saved jobs will appear here later.</p>
         </div>
@@ -142,76 +193,252 @@
         </section>
     </template>
 
+    <!-- JOB MODAL -->
+    <div id="job-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const outlet = document.getElementById('route-outlet');
             const navLinks = document.querySelectorAll('.nav-link');
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const navBar = document.getElementById('navBar');
+            const modal = document.getElementById('job-modal');
+            const modalBody = document.getElementById('modal-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            let savedJobIds = JSON.parse(localStorage.getItem('savedJobs')) || [];
+
+            // Filters state
+            let currentFilters = {
+                keyword: '',
+                location: '',
+                mode: '',
+                experience: '',
+                source: '',
+                sort: 'latest'
+            };
+
+            const toggleSaveJob = (id, buttonEl, route) => {
+                if (savedJobIds.includes(id)) {
+                    savedJobIds = savedJobIds.filter(jId => jId !== id);
+                } else {
+                    savedJobIds.push(id);
+                }
+                localStorage.setItem('savedJobs', JSON.stringify(savedJobIds));
+                
+                if (route === '/saved') {
+                    renderSavedView();
+                } else if (buttonEl) {
+                    buttonEl.textContent = savedJobIds.includes(id) ? 'Unsave' : 'Save';
+                    buttonEl.classList.toggle('btn-primary', savedJobIds.includes(id));
+                    buttonEl.classList.toggle('btn-secondary', !savedJobIds.includes(id));
+                }
+            };
+
+            const openModal = (jobId) => {
+                if (typeof jobsData === 'undefined') return;
+                const job = jobsData.find(j => j.id === jobId);
+                if (!job) return;
+
+                const isSaved = savedJobIds.includes(job.id);
+                modalBody.innerHTML = `
+                    <h2 style="font-size: 32px; font-family: var(--font-serif); margin-bottom: 8px;">${job.title}</h2>
+                    <p style="font-weight: 600; font-size: 18px; margin-bottom: 24px;">${job.company}</p>
+                    
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px;">
+                        <div><strong>Location:</strong> ${job.location}</div>
+                        <div><strong>Mode:</strong> ${job.mode}</div>
+                        <div><strong>Experience:</strong> ${job.experience}</div>
+                        <div><strong>Salary:</strong> ${job.salaryRange}</div>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 16px;">Description</h3>
+                    <p style="color: var(--color-text-muted); line-height: 1.8; margin-bottom: 32px;">${job.description}</p>
+                    
+                    <h3 style="margin-bottom: 16px;">Skills</h3>
+                    <div class="skills-list" style="margin-bottom: 40px;">
+                        ${job.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply Now</button>
+                        <button class="btn ${isSaved ? 'btn-primary' : 'btn-secondary'}" onclick="window.toggleSaveJobGlobal('${job.id}', this, 'modal')">${isSaved ? 'Unsave' : 'Save'}</button>
+                    </div>
+                `;
+                modal.classList.add('active');
+            };
+
+            const closeModal = () => modal.classList.remove('active');
+            modalCloseBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+            // Global expose for inline handlers
+            window.toggleSaveJobGlobal = (id, btn, route) => toggleSaveJob(id, btn, route);
+            window.openModalGlobal = openModal;
+
+            const createJobCardHTML = (job, currentPath) => {
+                const isSaved = savedJobIds.includes(job.id);
+                return `
+                    <div class="job-card">
+                        <div class="job-header">
+                            <div>
+                                <div class="job-title">${job.title}</div>
+                                <div class="job-company">${job.company}</div>
+                            </div>
+                            <div class="badge-source">${job.source}</div>
+                        </div>
+                        <div class="job-meta-row">
+                            <div class="job-meta-item">${job.location}</div>
+                            <div class="job-meta-item">${job.mode}</div>
+                            <div class="job-meta-item">${job.experience}</div>
+                            <div class="job-meta-item">${job.salaryRange}</div>
+                        </div>
+                        <div class="job-meta-row" style="margin-top: 8px; font-size: 12px;">
+                            ${job.postedDaysAgo === 0 ? 'Today' : job.postedDaysAgo + ' days ago'}
+                        </div>
+                        <div class="job-actions">
+                            <button class="btn btn-secondary" onclick="window.openModalGlobal('${job.id}')">View</button>
+                            <button class="btn ${isSaved ? 'btn-primary' : 'btn-secondary'}" onclick="window.toggleSaveJobGlobal('${job.id}', this, '${currentPath}')">${isSaved ? 'Unsave' : 'Save'}</button>
+                            <button class="btn btn-primary" onclick="window.open('${job.applyUrl}', '_blank')">Apply</button>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const applyFiltersAndSort = () => {
+                if (typeof jobsData === 'undefined') return [];
+                const keywordText = currentFilters.keyword.toLowerCase();
+                let filtered = jobsData.filter(job => {
+                    if (keywordText && !job.title.toLowerCase().includes(keywordText) && !job.company.toLowerCase().includes(keywordText)) return false;
+                    if (currentFilters.location && job.location !== currentFilters.location) return false;
+                    if (currentFilters.mode && job.mode !== currentFilters.mode) return false;
+                    if (currentFilters.experience && job.experience !== currentFilters.experience) return false;
+                    if (currentFilters.source && job.source !== currentFilters.source) return false;
+                    return true;
+                });
+
+                if (currentFilters.sort === 'oldest') {
+                    filtered.sort((a, b) => b.postedDaysAgo - a.postedDaysAgo);
+                } else {
+                    filtered.sort((a, b) => a.postedDaysAgo - b.postedDaysAgo);
+                }
+                return filtered;
+            };
+
+            const renderDashboardView = () => {
+                if (typeof jobsData === 'undefined') return;
+                const container = document.getElementById('dashboard-jobs-container');
+                const emptyState = document.getElementById('dashboard-empty-state');
+                const locSelect = document.getElementById('filter-location');
+                
+                if (!container || !emptyState || !locSelect) return;
+
+                // Populate dynamic location dropdown if not done
+                if (locSelect.options.length === 1) {
+                    const locations = [...new Set(jobsData.map(j => j.location))].sort();
+                    locations.forEach(loc => {
+                        const opt = document.createElement('option');
+                        opt.value = loc;
+                        opt.textContent = loc;
+                        locSelect.appendChild(opt);
+                    });
+                }
+
+                // Bind listener
+                ['keyword', 'location', 'mode', 'experience', 'source', 'sort'].forEach(key => {
+                    const el = document.getElementById(`filter-${key}`);
+                    if(el && !el.dataset.bound) {
+                        el.dataset.bound = 'true';
+                        el.addEventListener('input', e => {
+                            currentFilters[key] = e.target.value;
+                            renderDashboardView();
+                        });
+                    }
+                });
+
+                const filteredJobs = applyFiltersAndSort();
+                
+                if (filteredJobs.length === 0) {
+                    container.style.display = 'none';
+                    emptyState.style.display = 'flex';
+                } else {
+                    container.style.display = 'flex';
+                    emptyState.style.display = 'none';
+                    container.innerHTML = filteredJobs.map(job => createJobCardHTML(job, '/dashboard')).join('');
+                }
+            };
+
+            const renderSavedView = () => {
+                if (typeof jobsData === 'undefined') return;
+                const container = document.getElementById('saved-jobs-container');
+                const emptyState = document.getElementById('saved-empty-state');
+                if (!container || !emptyState) return;
+
+                const savedJobs = jobsData.filter(j => savedJobIds.includes(j.id));
+                
+                if (savedJobs.length === 0) {
+                    container.style.display = 'none';
+                    emptyState.style.display = 'flex';
+                } else {
+                    container.style.display = 'flex';
+                    emptyState.style.display = 'none';
+                    container.innerHTML = savedJobs.map(job => createJobCardHTML(job, '/saved')).join('');
+                }
+            };
 
             const renderRoute = (path) => {
-                // Clean up path
                 let currentPath = path || '/';
-                if (currentPath.startsWith('#')) {
-                    currentPath = currentPath.substring(1);
-                }
-                if (currentPath === '' || currentPath.endsWith('index.html')) {
-                    currentPath = '/';
-                }
+                if (currentPath.startsWith('#')) currentPath = currentPath.substring(1);
+                if (currentPath === '' || currentPath.endsWith('index.html')) currentPath = '/';
 
-                // Determine template ID
                 let templateId = `tpl-${currentPath}`;
                 let template = document.getElementById(templateId);
+                if (!template) template = document.getElementById('tpl-404');
 
-                if (!template) {
-                    template = document.getElementById('tpl-404');
-                }
-
-                // Clear outlet and inject new template content
                 outlet.innerHTML = '';
                 outlet.appendChild(template.content.cloneNode(true));
 
-                // Update active link
                 navLinks.forEach(link => {
                     link.classList.remove('active');
                     const linkPath = link.getAttribute('href');
-                    const hashPath = `#${linkPath}`;
-                    if (linkPath === currentPath || linkPath === `/${currentPath}` || currentPath === linkPath.substring(1)) {
+                    if (linkPath === currentPath || linkPath === "/" + currentPath || currentPath === linkPath.substring(1)) {
                         link.classList.add('active');
                     }
                 });
 
-                // Close mobile menu on navigation
                 navBar.classList.remove('open');
+
+                // Trigger specific route renders
+                if (currentPath === '/dashboard' || currentPath === 'dashboard') renderDashboardView();
+                if (currentPath === '/saved' || currentPath === 'saved') renderSavedView();
             };
 
             // Routing logic
             const navigateTo = (path) => {
                 const isLocalFile = window.location.protocol === 'file:';
                 if (isLocalFile) {
-                    // Safe local file routing using hash
                     window.location.hash = path;
                 } else {
-                    // Standard routing
                     history.pushState(null, '', path);
                     renderRoute(path);
                 }
             };
 
-            // Click interceptor for data-route links
             document.body.addEventListener('click', e => {
                 const routeEl = e.target.closest('[data-route]');
                 if (routeEl) {
                     e.preventDefault();
                     let path = routeEl.getAttribute('href');
-                    if (!path && routeEl.getAttribute('data-route')) {
-                        path = routeEl.getAttribute('data-route');
-                    }
+                    if (!path && routeEl.getAttribute('data-route')) path = routeEl.getAttribute('data-route');
                     if (path) navigateTo(path);
                 }
             });
 
-            // Handle browser back/forward buttons
             window.addEventListener('popstate', () => {
                 if (window.location.protocol !== 'file:') {
                     let path = window.location.pathname;
@@ -220,28 +447,22 @@
                 }
             });
             
-            // Handle local file back/forward buttons
             window.addEventListener('hashchange', () => {
                 if (window.location.protocol === 'file:') {
                     renderRoute(window.location.hash || '/');
                 }
             });
 
-            // Mobile menu toggle
             mobileMenuBtn.addEventListener('click', () => {
                 navBar.classList.toggle('open');
             });
 
-            // Handle the initial load
             let initialPath = window.location.pathname;
-            
-            // If opened directly as a local file, default to / or hash
             if (window.location.protocol === 'file:') {
                 initialPath = window.location.hash || '/';
             } else if (initialPath === '/' || initialPath.endsWith('index.html')) {
                 initialPath = '/';
             }
-            
             renderRoute(initialPath);
         });
     </script>
