@@ -619,3 +619,37 @@ a:hover {
 .modal-close:hover {
   color: var(--color-text);
 }
+
+/* SCORE BADGES */
+.badge-score {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  margin-left: var(--space-16);
+  vertical-align: middle;
+}
+
+.score-green {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.score-amber {
+  background-color: var(--color-warning);
+  color: #111;
+}
+
+.score-neutral {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.score-grey {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
